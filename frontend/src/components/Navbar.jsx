@@ -32,7 +32,6 @@ export default function Navbar() {
           <button onClick={() => scrollTo('about')} className="hover:text-[#6825A8] transition-colors">About</button>
           <button onClick={() => scrollTo('features')} className="hover:text-[#6825A8] transition-colors">Features</button>
           <button onClick={() => scrollTo('models')} className="hover:text-[#6825A8] transition-colors">Models</button>
-          <button onClick={() => scrollTo('team')} className="hover:text-[#6825A8] transition-colors">Research Team</button>
           <button onClick={() => scrollTo('contact')} className="hover:text-[#6825A8] transition-colors">Contact</button>
         </nav>
 

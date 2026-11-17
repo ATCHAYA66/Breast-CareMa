@@ -48,20 +48,7 @@ $$\mathbf{Y} = \text{MLP}(\mathbf{F}_{\text{Fused}})$$
 
 ---
 
-## 2. Research Team & Work Allotment
-
-Aligned directly with the project work allotment:
-
-| Team Member | Role | Key Contributions |
-| :--- | :--- | :--- |
-| **Partha Sarathy C** | **Team Lead & System Architect** | System planning, FastAPI backend integration, SQLite/SQLAlchemy schema, multi-agent workflow orchestration, deployment. |
-| **Atchaya M** | **AI/ML Engineer (Detection & Classification)** | Agent 1: YOLOv8 Tumor Detection, Agent 2: EfficientNetB0 Classification, BUSI & CBIS-DDSM dataset pipelines, benchmark evaluation. |
-| **Kalaiarasi C** | **Frontend & Explainability Engineer** | React + Vite UI, 9-screen clinical workflow, Agent 3: Grad-CAM XAI visualization, Recharts analytics, user experience. |
-| **Hariharasudhan S** | **Knowledge & Risk Analysis Engineer** | Agent 4: Clinical Evidence Retrieval (RAG), Agent 5: Risk Assessment, Agent 6: Report Generation, BI-RADS criteria logic. |
-
----
-
-## 3. Technology Stack (100% Free & Open-Source)
+## 2. Technology Stack (100% Free & Open-Source)
 
 - **Frontend:** React 19, Vite, Tailwind CSS, React Router DOM v7, Axios, Lucide React, Recharts, jsPDF
 - **Backend:** Python 3.11, FastAPI, Uvicorn, SQLAlchemy, SQLite
@@ -70,7 +57,7 @@ Aligned directly with the project work allotment:
 
 ---
 
-## 4. Nine Major Application Screens
+## 3. Nine Major Application Screens
 
 1. **Landing Page (`/`):** Hero section with medical previews, features, team attribution, free-tools disclosure.
 2. **Dashboard (`/dashboard`):** Statistics cards, Recharts donut modality breakdown, live AI engine telemetry, recent patient studies.
@@ -84,7 +71,7 @@ Aligned directly with the project work allotment:
 
 ---
 
-## 5. Quick Start Instructions
+## 4. Quick Start Instructions
 
 ### Option A: Run Full-Stack Unified Server (Recommended)
 FastAPI serves both the backend API and the built production React frontend:
@@ -107,7 +94,7 @@ Open your browser to: **http://localhost:5173**
 
 ---
 
-## 6. Verification & Automated Test Suite
+## 5. Verification & Automated Test Suite
 To execute the automated end-to-end diagnostic pipeline test:
 ```bash
 python -m backend.test_pipeline
@@ -122,5 +109,5 @@ This verifies:
 
 ---
 
-## 7. Mandatory Medical Disclaimer
+## 6. Mandatory Medical Disclaimer
 > **Academic Research Protocol:** This system is designed for academic research and AI-assisted decision support. It is not a substitute for professional medical diagnosis. All findings must be reviewed and correlated with standard clinical protocols by qualified healthcare professionals.

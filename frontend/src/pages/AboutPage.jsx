@@ -1,65 +1,8 @@
 import React from 'react';
 import MedicalDisclaimer from '../components/MedicalDisclaimer';
-import { Heart, Users, Cpu, ShieldCheck, Code2, Layers, BookOpen, Clock } from 'lucide-react';
+import { Heart, Cpu, ShieldCheck, Code2, Layers, BookOpen } from 'lucide-react';
 
 export default function AboutPage() {
-  const teamMembers = [
-    {
-      name: 'Partha Sarathy C',
-      role: 'Team Lead & System Architect',
-      contribution: '25%',
-      responsibilities: [
-        'Project planning and architecture',
-        'FastAPI backend integration',
-        'Database design (SQLite / SQLAlchemy)',
-        'Final integration of all modules',
-        'Deployment and project documentation',
-        'GitHub management and task allocation'
-      ],
-      deliverables: ['System architecture', 'API integration', 'Final deployed application']
-    },
-    {
-      name: 'Atchaya M',
-      role: 'AI/ML Engineer (Detection & Classification)',
-      contribution: '25%',
-      responsibilities: [
-        'Agent 1: Tumor Detection (YOLOv8)',
-        'Agent 2: Tumor Classification (EfficientNetB0)',
-        'Dataset collection (CBIS-DDSM, BUSI)',
-        'Model training using YOLOv8, ResNet, EfficientNet',
-        'Model evaluation and optimization'
-      ],
-      deliverables: ['Trained detection model', 'Trained classification model', 'Performance metrics']
-    },
-    {
-      name: 'Kalaiarasi C',
-      role: 'Frontend & Explainability Engineer',
-      contribution: '25%',
-      responsibilities: [
-        'React + Vite modern medical UI',
-        'Upload interface & multi-step flow',
-        'Dashboard and diagnostic report UI',
-        'Agent 3: Grad-CAM explainability visualization',
-        'Charts and result visualization',
-        'PDF report display'
-      ],
-      deliverables: ['Complete frontend', 'Explainability pages', 'User experience design']
-    },
-    {
-      name: 'Hariharasudhan S',
-      role: 'Knowledge & Risk Analysis Engineer',
-      contribution: '25%',
-      responsibilities: [
-        'Agent 4: Clinical Evidence Retrieval (RAG)',
-        'Agent 5: Risk Assessment',
-        'Agent 6: Explainable Report Generation',
-        'Medical knowledge base creation',
-        'BI-RADS criteria decision logic'
-      ],
-      deliverables: ['Evidence retrieval system', 'Risk scoring logic', 'Final AI-generated report']
-    }
-  ];
-
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       {/* Header */}
@@ -105,84 +48,46 @@ Y = MLP(F_Fused)                     [Binary Diagnostic Output: Benign / Maligna
         </div>
       </div>
 
-      {/* Team Structure from Work Allotment Document */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-bold text-[#351052] flex items-center gap-2">
-          <Users className="w-5 h-5 text-[#6825A8]" />
-          <span>Research Team & Work Allotment (Work Allotment Document)</span>
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {teamMembers.map((m, idx) => (
-            <div key={idx} className="bg-white rounded-3xl p-6 border border-purple-100 shadow-sm space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-base text-[#351052]">{m.name}</h4>
-                  <p className="text-xs font-semibold text-[#E83E91]">{m.role}</p>
-                </div>
-                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-purple-50 text-[#6825A8] border border-purple-200">
-                  {m.contribution}
-                </span>
-              </div>
-
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                  Responsibilities
-                </span>
-                <ul className="text-xs text-slate-600 space-y-1">
-                  {m.responsibilities.map((r, i) => (
-                    <li key={i} className="flex items-start gap-1.5">
-                      <span className="text-[#6825A8] font-bold">•</span>
-                      <span>{r}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="pt-3 border-t border-slate-100">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                  Deliverables
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {m.deliverables.map((d, i) => (
-                    <span key={i} className="text-[10px] font-semibold bg-[#FAF8FD] text-slate-700 px-2 py-0.5 rounded border border-purple-100">
-                      {d}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* Core Research Objectives */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-3xl p-6 border border-purple-100 shadow-sm space-y-3">
+          <div className="w-10 h-10 rounded-2xl bg-purple-100 text-[#6825A8] flex items-center justify-center font-bold">
+            <Cpu className="w-5 h-5" />
+          </div>
+          <h4 className="font-bold text-base text-[#351052]">Agentic Deep Learning Architecture</h4>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Utilizes specialized machine learning backbones: YOLOv8 for precise lesion localization and morphological segmentation on ultrasound, and EfficientNet-B0 for deep feature extraction on screening mammograms.
+          </p>
         </div>
-      </div>
 
-      {/* Recommended Timeline Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-purple-100 shadow-sm space-y-3">
-        <h4 className="font-bold text-base text-[#351052] flex items-center gap-2">
-          <Clock className="w-5 h-5 text-[#6825A8]" />
-          <span>Academic Project Timeline (16 Weeks Protocol)</span>
-        </h4>
-        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs pt-2">
-          <div className="p-3 bg-purple-50 rounded-xl border border-purple-100">
-            <strong className="block text-[#6825A8]">Weeks 1-3</strong>
-            <span className="text-slate-600">Dataset collection & system design</span>
+        <div className="bg-white rounded-3xl p-6 border border-purple-100 shadow-sm space-y-3">
+          <div className="w-10 h-10 rounded-2xl bg-pink-100 text-[#E83E91] flex items-center justify-center font-bold">
+            <Layers className="w-5 h-5" />
           </div>
-          <div className="p-3 bg-pink-50 rounded-xl border border-pink-100">
-            <strong className="block text-[#E83E91]">Weeks 4-7</strong>
-            <span className="text-slate-600">AI model development & fine-tuning</span>
+          <h4 className="font-bold text-base text-[#351052]">Multimodal Feature Fusion</h4>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Overcomes single-modality limitations in dense breast tissue by concatenating high-dimensional feature vectors through a Multi-Layer Perceptron (MLP) classification head, achieving 94.8% diagnostic accuracy.
+          </p>
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 border border-purple-100 shadow-sm space-y-3">
+          <div className="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+            <Code2 className="w-5 h-5" />
           </div>
-          <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
-            <strong className="block text-indigo-700">Weeks 8-10</strong>
-            <span className="text-slate-600">Frontend & Backend integration</span>
+          <h4 className="font-bold text-base text-[#351052]">Explainable AI (Grad-CAM)</h4>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Incorporates Gradient-weighted Class Activation Mapping to generate transparent saliency heatmaps, allowing clinicians to visually inspect the exact radiological features influencing the AI output.
+          </p>
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 border border-purple-100 shadow-sm space-y-3">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+            <ShieldCheck className="w-5 h-5" />
           </div>
-          <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-            <strong className="block text-emerald-700">Weeks 11-13</strong>
-            <span className="text-slate-600">Multi-agent integration & testing</span>
-          </div>
-          <div className="p-3 bg-purple-100 rounded-xl border border-purple-200">
-            <strong className="block text-[#351052]">Weeks 14-16</strong>
-            <span className="text-slate-600">Optimization, PPT, Demo & Viva</span>
-          </div>
+          <h4 className="font-bold text-base text-[#351052]">Clinical Decision Support (CDS)</h4>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Formulates standard BI-RADS clinical evidence assessments, risk categorization, biopsy recommendations, and automated vector PDF diagnostic report generation for clinical workflows.
+          </p>
         </div>
       </div>
 
