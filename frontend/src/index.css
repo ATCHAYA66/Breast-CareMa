@@ -1,0 +1,6 @@
+/* Inter and medical styling */
+@layer base {
+  body {
+    @apply bg-[#FAF8FD] text-[#1F1329];
+  }
+}
