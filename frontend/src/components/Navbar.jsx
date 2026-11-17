@@ -41,7 +41,7 @@ export default function Navbar() {
             to="/dashboard"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-[#6825A8] to-[#E83E91] hover:shadow-lg hover:shadow-purple-500/25 active:scale-95 transition-all"
           >
-            <span>Launch Dashboard</span>
+            <span>Launch Diagnostic System</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
