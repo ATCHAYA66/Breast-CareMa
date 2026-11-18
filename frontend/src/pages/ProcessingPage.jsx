@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import ProgressSteps from '../components/ProgressSteps';
 import MedicalDisclaimer from '../components/MedicalDisclaimer';
 import { diagnosisApi } from '../services/api';
@@ -17,6 +17,8 @@ import {
 
 export default function ProcessingPage() {
   const { studyId } = useParams();
+  const [searchParams] = useSearchParams();
+  const patientId = searchParams.get('patient_id');
   const navigate = useNavigate();
 
   const [currentStageIdx, setCurrentStageIdx] = useState(0);
@@ -63,7 +65,7 @@ export default function ProcessingPage() {
       }, 2300);
 
       // Trigger backend API inference
-      const res = await diagnosisApi.analyze(studyId);
+      const res = await diagnosisApi.analyze(studyId, patientId);
       setStudyData(res.data);
 
       // Stage 5: Multimodal Fusion

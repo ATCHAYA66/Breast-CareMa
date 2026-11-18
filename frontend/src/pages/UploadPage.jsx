@@ -39,6 +39,21 @@ export default function UploadPage() {
   const studyId = searchParams.get('study_id');
   const modality = searchParams.get('modality') || 'dual';
 
+  // Auto-initialize study session if accessed directly without study_id
+  useEffect(() => {
+    if (!studyId) {
+      diagnosisApi.create(modality)
+        .then(res => {
+          const newStudyId = res.data.study_id;
+          navigate(`/diagnosis/upload?study_id=${newStudyId}&modality=${modality}`, { replace: true });
+        })
+        .catch(err => {
+          console.error('Failed to auto-initialize study session:', err);
+          setError('Could not initialize scan session. Please ensure the backend server is running on http://localhost:8000.');
+        });
+    }
+  }, [studyId, modality, navigate]);
+
   // SECTION 1: Patient Information State
   const [patientId, setPatientId] = useState(() => {
     return sessionStorage.getItem(`patient_id_${studyId}`) || `PT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;

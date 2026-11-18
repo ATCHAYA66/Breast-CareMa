@@ -13,6 +13,11 @@ WEIGHTS_DIR = BASE_DIR / "weights"
 for directory in [UPLOADS_DIR, OUTPUTS_DIR, REPORTS_DIR, WEIGHTS_DIR, BASE_DIR / "database"]:
     directory.mkdir(parents=True, exist_ok=True)
 
+# Set Ultralytics config directory locally inside backend to prevent AppData Permission/Access Denied errors
+ULTRALYTICS_DIR = BASE_DIR / ".ultralytics"
+ULTRALYTICS_DIR.mkdir(parents=True, exist_ok=True)
+os.environ["YOLO_CONFIG_DIR"] = str(ULTRALYTICS_DIR)
+
 # Allowed file types and max upload size (30MB)
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp"}
 MAX_FILE_SIZE_BYTES = 30 * 1024 * 1024
