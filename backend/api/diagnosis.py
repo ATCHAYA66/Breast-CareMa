@@ -38,7 +38,11 @@ def format_diagnosis_response(diag: Diagnosis, db: Session = None) -> dict:
             "id": mr.id,
             "model_name": mr.model_name,
             "predicted_class": mr.predicted_class,
-            "confidence": mr.confidence,
+            "confidence": (
+                mr.confidence
+                if raw_obj.get("confidence_available", True)
+                else None
+            ),
             "output_url": f"/outputs/{Path(mr.output_path).name}" if mr.output_path else None,
             "raw_data": raw_obj,
             "created_at": mr.created_at

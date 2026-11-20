@@ -1,0 +1,39 @@
+{
+  "workflow_1_ultrasound": {
+    "status": "passed",
+    "study_id": "BCMA-20261119-4B7E",
+    "prediction": "Benign",
+    "confidence": 0.9967,
+    "lesion_area": 1.53,
+    "models": [
+      "BUSI EfficientNet-B0 (3-Class)",
+      "BUSI Compact U-Net (Binary)",
+      "YOLOv8 Tumor Detector (Audited / Decommissioned)"
+    ]
+  },
+  "workflow_2_mammography": {
+    "status": "passed",
+    "study_id": "BCMA-20261119-6F00",
+    "prediction": "Benign",
+    "confidence": 0.64,
+    "models": [
+      "EfficientNetB0 Classifier"
+    ]
+  },
+  "workflow_3_dual": {
+    "status": "passed",
+    "study_id": "BCMA-20261119-62FE",
+    "prediction": "Dual Examination (Independent Findings)",
+    "confidence": null,
+    "models": [
+      "BUSI EfficientNet-B0 (3-Class)",
+      "BUSI Compact U-Net (Binary)",
+      "YOLOv8 Tumor Detector (Audited / Decommissioned)",
+      "EfficientNetB0 Classifier",
+      "Dual Scan (Independent Correlation)"
+    ]
+  },
+  "telemetry_and_audit": {
+    "status": "passed"
+  }
+}

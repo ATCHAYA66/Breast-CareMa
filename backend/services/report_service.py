@@ -10,7 +10,7 @@ from reportlab.platypus import (
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 
-from backend.config import REPORTS_DIR
+from backend.config import REPORTS_DIR, OUTPUTS_DIR
 
 def generate_pdf_report(diagnosis_data: Dict[str, Any]) -> str:
     """
@@ -136,13 +136,13 @@ def generate_pdf_report(diagnosis_data: Dict[str, Any]) -> str:
     patient_table_data = [
         [
             Paragraph("<b>Patient Identifier:</b>", body_style), Paragraph(f"<b>{patient_id}</b>", body_bold),
-            Paragraph("<b>Patient Age:</b>", body_style), Paragraph(f"{age} Years", body_bold),
-            Paragraph("<b>Breast Examined:</b>", body_style), Paragraph(f"{breast_side}", body_bold)
+            Paragraph("<b>Patient Age:</b>", body_style), Paragraph(f"{age} yrs", body_style),
+            Paragraph("<b>Target Breast:</b>", body_style), Paragraph(f"{breast_side}", body_style)
         ],
         [
             Paragraph("<b>Menopause Status:</b>", body_style), Paragraph(f"{menopause}", body_style),
             Paragraph("<b>Breast Density:</b>", body_style), Paragraph(f"{density}", body_style),
-            Paragraph("<b>1st-Degree Malignancy:</b>", body_style), Paragraph(f"{family_history}", body_style)
+            Paragraph("<b>Family History:</b>", body_style), Paragraph(f"{family_history}", body_style)
         ],
         [
             Paragraph("<b>Reported Symptoms:</b>", body_style), Paragraph(f"{symptoms_val}", body_style),
@@ -163,19 +163,20 @@ def generate_pdf_report(diagnosis_data: Dict[str, Any]) -> str:
 
     # 3. Examination & AI Findings Summary Table
     modality = diagnosis_data.get("modality", "dual").upper()
-    prediction = diagnosis_data.get("prediction", "Benign")
-    confidence = diagnosis_data.get("confidence", 0.0)
-    birads = diagnosis_data.get("birads_category", "BI-RADS 2 (Benign)")
-
-    status_color = colors.HexColor("#16A36A") if "benign" in prediction.lower() else colors.HexColor("#E5484D")
+    prediction = diagnosis_data.get("prediction", "Inconclusive")
+    confidence = diagnosis_data.get("confidence")
+    birads = diagnosis_data.get("birads_category") or "Not assigned by AI system"
+    detection_status = diagnosis_data.get("detection_status", "not provided")
+    status_color = colors.HexColor("#64748B") if prediction.lower() == "inconclusive" else colors.HexColor("#1F2937")
+    confidence_text = f"{confidence * 100:.1f}% (model score; not a cancer probability)" if confidence is not None else "N/A"
 
     summary_data = [
         [Paragraph("<b>Examination Modality:</b>", body_style), Paragraph(f"{modality} SCAN", body_bold),
-         Paragraph("<b>Analysis Status:</b>", body_style), Paragraph("COMPLETED (VERIFIED)", body_bold)],
-        [Paragraph("<b>AI Diagnosis:</b>", body_style), Paragraph(f"<font color='{status_color}'><b>{prediction.upper()}</b></font>", body_bold),
-         Paragraph("<b>Model Confidence:</b>", body_style), Paragraph(f"<b>{confidence * 100:.1f}%</b>", body_bold)],
+         Paragraph("<b>Analysis Status:</b>", body_style), Paragraph("COMPLETED (AI PROCESS)", body_bold)],
+        [Paragraph("<b>AI Model Output:</b>", body_style), Paragraph(f"<font color='{status_color}'><b>{prediction.upper()}</b></font>", body_bold),
+         Paragraph("<b>Model Confidence:</b>", body_style), Paragraph(f"<b>{confidence_text}</b>", body_bold)],
         [Paragraph("<b>BI-RADS Assessment:</b>", body_style), Paragraph(f"<b>{birads}</b>", body_bold),
-         Paragraph("<b>Engine Version:</b>", body_style), Paragraph("BCMA-XAI v1.4 Local Engine", body_style)],
+         Paragraph("<b>Detection Status:</b>", body_style), Paragraph(str(detection_status).replace("_", " ").upper(), body_style)],
     ]
     summary_table = Table(summary_data, colWidths=[1.8 * inch, 1.8 * inch, 1.8 * inch, 1.8 * inch])
     summary_table.setStyle(TableStyle([
@@ -191,13 +192,15 @@ def generate_pdf_report(diagnosis_data: Dict[str, Any]) -> str:
     # 4. Quantitative Morphological Findings
     elements.append(Paragraph("Quantitative Morphological Findings", section_heading))
     qf = diagnosis_data.get("quantitative_findings", {})
+    lesion_area_value = qf.get("lesion_area_px") if qf.get("lesion_area_px") is not None else qf.get("lesion_area")
+    aspect_ratio_value = qf.get("aspect_ratio")
     qf_data = [
-        [Paragraph("<b>Morphological Metric</b>", body_bold), Paragraph("<b>Evaluated AI Value</b>", body_bold), Paragraph("<b>Clinical Interpretation Criterion</b>", body_bold)],
-        [Paragraph("Lesion Surface Area", body_style), Paragraph(f"{qf.get('lesion_area', '245.0')} sq px", body_style), Paragraph("Bounding Box Pixel Extent / Mass Dimension", body_style)],
-        [Paragraph("Aspect Ratio (Width / Height)", body_style), Paragraph(f"{qf.get('aspect_ratio', '1.25')}", body_style), Paragraph("> 1.0 indicates parallel (wider-than-tall); < 1.0 suspicious (taller-than-wide)", body_style)],
-        [Paragraph("Margin Characteristic", body_style), Paragraph(f"{qf.get('margin', 'Circumscribed')}", body_style), Paragraph("Spiculated/Microlobulated margins correlate with higher risk", body_style)],
-        [Paragraph("Tissue Orientation", body_style), Paragraph(f"{qf.get('orientation', 'Parallel')}", body_style), Paragraph("Parallel orientation typical of benign fibroadenoma", body_style)],
-        [Paragraph("Shape Profile", body_style), Paragraph(f"{qf.get('shape', 'Oval')}", body_style), Paragraph("Oval/Round indicates standard benign presentation", body_style)],
+        [Paragraph("<b>Model-derived measurement</b>", body_bold), Paragraph("<b>Value</b>", body_bold), Paragraph("<b>Interpretation limit</b>", body_bold)],
+        [Paragraph("Bounding-box area", body_style), Paragraph(f"{lesion_area_value} px²" if lesion_area_value is not None else "N/A", body_style), Paragraph("Geometric box area only; not a segmented tumor area", body_style)],
+        [Paragraph("Bounding-box aspect ratio (W/H)", body_style), Paragraph(f"{aspect_ratio_value}" if aspect_ratio_value is not None else "N/A", body_style), Paragraph("Box geometry only; does not establish tissue orientation", body_style)],
+        [Paragraph("Shape", body_style), Paragraph(str(qf.get("shape", "Not assessed")), body_style), Paragraph("Not clinically assessed by YOLO bounding box", body_style)],
+        [Paragraph("Margin", body_style), Paragraph(str(qf.get("margin", "Not assessed")), body_style), Paragraph("Not clinically assessed by YOLO bounding box", body_style)],
+        [Paragraph("Orientation", body_style), Paragraph(str(qf.get("orientation", "Not assessed")), body_style), Paragraph("Not clinically assessed by YOLO bounding box", body_style)],
     ]
     qf_table = Table(qf_data, colWidths=[2.0 * inch, 1.6 * inch, 3.6 * inch])
     qf_table.setStyle(TableStyle([
@@ -218,19 +221,23 @@ def generate_pdf_report(diagnosis_data: Dict[str, Any]) -> str:
     img_row = []
     caption_row = []
 
-    if us_annotated and Path(us_annotated).exists():
-        try:
-            img_row.append(RLImage(str(us_annotated), width=3.2 * inch, height=2.2 * inch))
-            caption_row.append(Paragraph("<b>Figure 1:</b> Ultrasound YOLOv8 Detection", body_style))
-        except Exception:
-            pass
+    if us_annotated:
+        us_file_path = OUTPUTS_DIR / Path(us_annotated).name if not Path(us_annotated).is_file() else Path(us_annotated)
+        if us_file_path.exists():
+            try:
+                img_row.append(RLImage(str(us_file_path), width=3.2 * inch, height=2.2 * inch))
+                caption_row.append(Paragraph("<b>Figure 1:</b> BUSI Ultrasound Dual-Model Overlay", body_style))
+            except Exception:
+                pass
 
-    if mg_overlay and Path(mg_overlay).exists():
-        try:
-            img_row.append(RLImage(str(mg_overlay), width=3.2 * inch, height=2.2 * inch))
-            caption_row.append(Paragraph("<b>Figure 2:</b> Mammography Grad-CAM Overlay", body_style))
-        except Exception:
-            pass
+    if mg_overlay:
+        mg_file_path = OUTPUTS_DIR / Path(mg_overlay).name if not Path(mg_overlay).is_file() else Path(mg_overlay)
+        if mg_file_path.exists():
+            try:
+                img_row.append(RLImage(str(mg_file_path), width=3.2 * inch, height=2.2 * inch))
+                caption_row.append(Paragraph("<b>Figure 2:</b> Mammography Grad-CAM Overlay", body_style))
+            except Exception:
+                pass
 
     if img_row:
         visual_table = Table([img_row, caption_row], colWidths=[3.6 * inch] * len(img_row))
@@ -266,10 +273,11 @@ def generate_pdf_report(diagnosis_data: Dict[str, Any]) -> str:
 
     # 7. Prominent Medical Disclaimer (Strictly Required)
     disclaimer_text = (
-        "<b>LEGAL & CLINICAL DISCLAIMER:</b> This diagnostic report was generated by BREAST CARE-MA, an academic "
-        "research multimodal deep learning system combining Ultrasound YOLOv8 and Mammography EfficientNetB0 models. "
-        "This system is designed for academic research and AI-assisted decision support. It is not a substitute for "
-        "professional medical diagnosis. All findings must be reviewed by qualified healthcare professionals."
+        "<b>ACADEMIC RESEARCH DISCLAIMER:</b> This report contains experimental AI model outputs only. "
+        "A model prediction or confidence score is not a confirmed diagnosis or a cancer probability. "
+        "No BI-RADS assessment is assigned by this software. A qualified breast radiologist must review "
+        "the original images and provide the clinical interpretation. Do not use this report alone for "
+        "screening, diagnosis, treatment, or follow-up decisions."
     )
     disclaimer_box = Table([[Paragraph(disclaimer_text, disclaimer_style)]], colWidths=[7.2 * inch])
     disclaimer_box.setStyle(TableStyle([

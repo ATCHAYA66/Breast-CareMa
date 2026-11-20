@@ -1,0 +1,27 @@
+{
+  "class_names": [
+    "Benign",
+    "Malignant",
+    "Normal"
+  ],
+  "test_confusion_matrix": [
+    [
+      61,
+      3,
+      2
+    ],
+    [
+      7,
+      25,
+      0
+    ],
+    [
+      2,
+      4,
+      14
+    ]
+  ],
+  "test_accuracy": 0.847457627118644,
+  "best_validation_accuracy": 0.9067796610169492,
+  "checkpoint": "backend\\weights\\research_busi_classifier_best.pth"
+}

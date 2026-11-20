@@ -1,0 +1,64 @@
+{
+  "check_1_architecture": {
+    "backbone": "EfficientNet",
+    "classifier_head": "Sequential(\n  (0): Dropout(p=0.3, inplace=True)\n  (1): Linear(in_features=1280, out_features=2, bias=True)\n)",
+    "weights_path": "D:\\cancer\\backend\\weights\\efficientnet_b0_mammography.pth"
+  },
+  "check_2_checkpoint_file": {
+    "file_exists": false,
+    "is_custom_trained": false
+  },
+  "check_3_dataset_classes": {
+    "dataset": "CBIS-DDSM",
+    "classes": [
+      "Benign",
+      "Malignant"
+    ]
+  },
+  "check_4_preprocessing": {
+    "input_dimensions": [
+      1,
+      3,
+      224,
+      224
+    ],
+    "target_size": [
+      224,
+      224
+    ],
+    "channels": 3,
+    "normalization": "ImageNet"
+  },
+  "check_5_upload": {
+    "study_id": "BCMA-20261119-BAD4",
+    "upload_http_code": 200
+  },
+  "check_6_7_inference": {
+    "status": "completed",
+    "predicted_class": "Benign",
+    "confidence": 0.5345,
+    "probabilities": {
+      "Benign": 0.5345,
+      "Malignant": 0.4655
+    },
+    "is_custom_trained": false
+  },
+  "check_8_gradcam": {
+    "output_url": "/outputs/BCMA-20261119-BAD4_gradcam_overlay.jpg",
+    "http_code": 200,
+    "content_type": "image/jpeg",
+    "bytes": 58479
+  },
+  "check_9_negative_testing": {
+    "disallowed_extension_code": 400,
+    "empty_file_code": 400,
+    "corrupted_image_code": 503
+  },
+  "check_10_isolation": {
+    "models_recorded": [
+      "EfficientNetB0 Classifier"
+    ],
+    "busi_called": false,
+    "yolo_called": false
+  }
+}

@@ -13,6 +13,7 @@ import ClinicalDecisionPage from './pages/ClinicalDecisionPage';
 import ReportPage from './pages/ReportPage';
 import HistoryPage from './pages/HistoryPage';
 import ModelInsightsPage from './pages/ModelInsightsPage';
+import BusiResearchPage from './pages/BusiResearchPage';
 import AboutPage from './pages/AboutPage';
 import SettingsPage from './pages/SettingsPage';
 
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/reports" element={<HistoryPage />} />
           <Route path="/models" element={<ModelInsightsPage />} />
+          <Route path="/research/busi" element={<BusiResearchPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>

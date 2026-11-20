@@ -1,5 +1,12 @@
 import os
+import sys
 from pathlib import Path
+
+# Ensure project root is in sys.path
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -7,7 +14,7 @@ from fastapi.responses import FileResponse
 
 from backend.config import UPLOADS_DIR, OUTPUTS_DIR, REPORTS_DIR, BASE_DIR
 from backend.database.connection import engine, Base, run_migrations
-from backend.api import diagnosis, dashboard, models_api, reports, patients
+from backend.api import diagnosis, dashboard, models_api, reports, patients, research
 
 # Initialize database schema and run backward-compatible migrations
 Base.metadata.create_all(bind=engine)
@@ -39,6 +46,7 @@ app.include_router(diagnosis.router)
 app.include_router(dashboard.router)
 app.include_router(models_api.router)
 app.include_router(reports.router)
+app.include_router(research.router)
 
 @app.get("/api/health")
 def health_check():

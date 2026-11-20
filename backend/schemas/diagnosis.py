@@ -19,7 +19,7 @@ class ModelResultResponse(BaseModel):
     id: int
     model_name: str
     predicted_class: str
-    confidence: float
+    confidence: Optional[float] = None
     output_url: Optional[str] = None
     raw_data: Optional[Dict[str, Any]] = None
     created_at: datetime

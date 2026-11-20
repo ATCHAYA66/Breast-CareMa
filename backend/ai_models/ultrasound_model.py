@@ -1,145 +1,198 @@
 import os
+import logging
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 import cv2
-import numpy as np
-from PIL import Image
 
 from backend.config import YOLO_WEIGHTS_PATH, OUTPUTS_DIR
 from backend.ai_models.preprocessing import load_and_validate_image
 
-CLASS_NAMES = {0: "Benign", 1: "Malignant", 2: "Normal"}
+logger = logging.getLogger("breast_care_ma.ultrasound")
+
 
 class UltrasoundTumorDetector:
-    def __init__(self, weights_path: Path = YOLO_WEIGHTS_PATH):
+    """YOLOv8 ultrasound detector. No-detection is never treated as benign."""
+
+    def __init__(self, weights_path: Path = YOLO_WEIGHTS_PATH, conf_threshold: float = 0.25):
         self.weights_path = Path(weights_path)
+        self.conf_threshold = float(conf_threshold)
         self.model = None
         self.is_custom_trained = False
+        self.class_names = {}
         self.load_model()
 
-    def load_model(self):
+    def load_model(self) -> None:
+        if not self.weights_path.is_file():
+            print(f"[YOLOv8] Medical weights not found at path: {self.weights_path}")
+            self.model = None
+            self.is_custom_trained = False
+            return
+
         try:
             from ultralytics import YOLO
-            if self.weights_path.exists():
-                print(f"[YOLOv8] Loading trained weights from {self.weights_path}")
-                self.model = YOLO(str(self.weights_path))
-                self.is_custom_trained = True
+            self.model = YOLO(str(self.weights_path))
+            names = self.model.names
+            if isinstance(names, list):
+                names = {i: name for i, name in enumerate(names)}
+            self.class_names = names
+
+            # Distinguish custom fine-tuned weights from default COCO weights
+            is_coco = (len(names) == 80 and names.get(0) == "person")
+            self.is_custom_trained = not is_coco
+
+            if is_coco:
+                print(
+                    f"[YOLOv8 WARNING] Weights file '{self.weights_path.name}' contains standard 80 COCO classes. "
+                    f"Model is NOT fine-tuned on breast ultrasound lesions (e.g., Benign / Malignant)."
+                )
             else:
-                print(f"[YOLOv8] Weights file not found at {self.weights_path}. Initializing YOLOv8 model architecture...")
-                self.model = YOLO("yolov8n.pt")  # Initial model
-                self.is_custom_trained = False
-        except Exception as e:
-            print(f"[YOLOv8] Error loading model: {e}")
+                print(f"[YOLOv8] Loaded custom trained weights ({self.weights_path.name}) with classes: {self.class_names}")
+
+        except Exception as exc:
+            print(f"[YOLOv8 ERROR] Failed to load model weights: {exc}")
             self.model = None
+            self.is_custom_trained = False
+            self.class_names = {}
 
     def analyze(self, image_path: str, study_id: str) -> Dict[str, Any]:
-        """
-        Runs ultrasound tumor detection.
-        Returns detection metadata, annotated image path, and quantitative measurements.
-        """
         img_rgb = load_and_validate_image(image_path)
-        h, w, _ = img_rgb.shape
-
-        boxes_list = []
-        best_conf = 0.0
-        predicted_class = "Normal"
+        img_h, img_w, img_c = img_rgb.shape
         annotated_filename = f"{study_id}_us_annotated.jpg"
         annotated_path = OUTPUTS_DIR / annotated_filename
 
-        if self.model is not None:
-            try:
-                results = self.model(img_rgb, verbose=False)
-                res = results[0]
+        print(f"[YOLOv8 Inference] Study: {study_id} | File: {Path(image_path).name} | Dims: {img_w}x{img_h}x{img_c} | Conf Threshold: {self.conf_threshold}")
 
-                # If detections are found
-                if len(res.boxes) > 0:
-                    for box in res.boxes:
-                        xyxy = box.xyxy[0].cpu().numpy().tolist()
-                        conf = float(box.conf[0].cpu().numpy())
-                        cls_id = int(box.cls[0].cpu().numpy())
-                        cls_name = self.model.names.get(cls_id, CLASS_NAMES.get(cls_id, "Lesion"))
-                        
-                        # Capitalize properly
-                        if cls_name.lower() == "benign":
-                            cls_name = "Benign"
-                        elif cls_name.lower() == "malignant":
-                            cls_name = "Malignant"
-
-                        boxes_list.append({
-                            "box": [round(coord, 1) for coord in xyxy],
-                            "class": cls_name,
-                            "confidence": round(conf, 4)
-                        })
-
-                        if conf > best_conf:
-                            best_conf = conf
-                            predicted_class = cls_name
-
-                    # Save annotated image from ultralytics result plot
-                    annotated_bgr = res.plot()
-                    cv2.imwrite(str(annotated_path), annotated_bgr)
-                else:
-                    # No boxes detected by model - perform clinical analysis check
-                    best_conf = 0.85
-                    predicted_class = "Benign"
-                    # Generate annotated scan showing inspected ultrasound region
-                    annotated_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
-                    cv2.imwrite(str(annotated_path), annotated_bgr)
-            except Exception as e:
-                print(f"[YOLOv8] Inference warning: {e}")
-                annotated_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
-                cv2.imwrite(str(annotated_path), annotated_bgr)
-                predicted_class = "Benign"
-                best_conf = 0.82
-        else:
-            # Fallback if torch/ultralytics cannot load
-            annotated_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
-            cv2.imwrite(str(annotated_path), annotated_bgr)
-            predicted_class = "Benign"
-            best_conf = 0.80
-
-        # Quantitative morphological metrics from largest detected box or region
-        lesion_area = 0.0
-        aspect_ratio = 1.0
-        margin = "Circumscribed"
-        orientation = "Parallel"
-        shape = "Oval"
-
-        if boxes_list:
-            b = boxes_list[0]["box"]
-            bw = abs(b[2] - b[0])
-            bh = abs(b[3] - b[1])
-            lesion_area = round(float(bw * bh), 1)
-            aspect_ratio = round(float(bw / (bh + 1e-5)), 2)
-            if predicted_class == "Malignant":
-                margin = "Non-circumscribed / Spiculated"
-                orientation = "Non-parallel (Taller-than-wide)"
-                shape = "Irregular"
-            else:
-                margin = "Circumscribed / Microlobulated"
-                orientation = "Parallel (Wider-than-tall)"
-                shape = "Oval / Macrolobulated"
-        else:
-            # Default morphological assessment for clear tissue
-            lesion_area = 245.0
-            aspect_ratio = 1.35
-            margin = "Circumscribed"
-            orientation = "Parallel"
-            shape = "Oval"
-
-        return {
+        base = {
             "model_name": "YOLOv8",
+            "weights_path": str(self.weights_path),
             "is_custom_trained": self.is_custom_trained,
-            "predicted_class": predicted_class,
-            "confidence": round(float(best_conf), 4),
-            "boxes": boxes_list,
+            "predicted_class": "Inconclusive",
+            "confidence": None,
+            "detection_status": "model_unavailable",
+            "boxes": [],
+            "image_dimensions": {"width": img_w, "height": img_h, "channels": img_c},
             "output_image_path": str(annotated_path),
             "output_image_filename": annotated_filename,
             "quantitative_findings": {
-                "lesion_area": lesion_area,
-                "aspect_ratio": aspect_ratio,
-                "shape": shape,
-                "margin": margin,
-                "orientation": orientation
-            }
+                "lesion_area_px": None,
+                "lesion_area": None,
+                "aspect_ratio": None,
+                "shape": "Not assessed",
+                "margin": "Not assessed",
+                "orientation": "Not assessed",
+            },
         }
+
+        # Save original image for traceability if model is unavailable
+        original_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
+        if self.model is None:
+            cv2.imwrite(str(annotated_path), original_bgr)
+            print(f"[YOLOv8 Inference] Aborted: YOLO model instance is None.")
+            return base
+
+        try:
+            results = self.model.predict(
+                source=img_rgb,
+                conf=self.conf_threshold,
+                verbose=False,
+            )
+            if not results:
+                raise RuntimeError("YOLO returned an empty results list")
+            result = results[0]
+            names = self.model.names
+            if isinstance(names, list):
+                names = {i: name for i, name in enumerate(names)}
+
+            boxes_list = []
+            for box in result.boxes if result.boxes is not None else []:
+                coords = box.xyxy[0].detach().cpu().tolist()
+                confidence = float(box.conf[0].detach().cpu().item())
+                class_id = int(box.cls[0].detach().cpu().item())
+                raw_class_name = str(names.get(class_id, f"class_{class_id}"))
+                
+                # Format medical class names cleanly
+                if raw_class_name.lower() == "benign":
+                    class_name = "Benign"
+                elif raw_class_name.lower() == "malignant":
+                    class_name = "Malignant"
+                elif raw_class_name.lower() == "normal":
+                    class_name = "Normal"
+                else:
+                    class_name = raw_class_name
+
+                x1, y1, x2, y2 = [float(v) for v in coords]
+                width = max(0.0, x2 - x1)
+                height = max(0.0, y2 - y1)
+                box_info = {
+                    "box": [round(x1, 1), round(y1, 1), round(x2, 1), round(y2, 1)],
+                    "class_id": class_id,
+                    "class": class_name,
+                    "confidence": round(confidence, 4),
+                    "area_px": round(width * height, 1),
+                    "aspect_ratio": round(width / height, 3) if height > 0 else None,
+                }
+                boxes_list.append(box_info)
+                print(f"[YOLOv8 Detection] Box found: {box_info['box']}, Class='{class_name}' (ID={class_id}), Conf={confidence:.4f}, Area={box_info['area_px']} px²")
+
+            annotated_bgr = result.plot() if boxes_list else original_bgr
+            if not cv2.imwrite(str(annotated_path), annotated_bgr):
+                raise RuntimeError(f"Could not write annotated image: {annotated_path}")
+
+            if not boxes_list:
+                # Probe candidates below threshold to log near-miss detections
+                highest_sub_conf = None
+                sub_class = None
+                try:
+                    probe = self.model.predict(source=img_rgb, conf=0.01, verbose=False)
+                    if probe and probe[0].boxes and len(probe[0].boxes) > 0:
+                        top_box = probe[0].boxes[0]
+                        highest_sub_conf = float(top_box.conf[0].item())
+                        sub_class = names.get(int(top_box.cls[0].item()), "unknown")
+                except Exception:
+                    pass
+
+                if highest_sub_conf is not None:
+                    print(f"[YOLOv8 Inference] Study {study_id}: 0 boxes met conf_threshold={self.conf_threshold}. Highest candidate below threshold: {highest_sub_conf:.4f} (class: '{sub_class}')")
+                else:
+                    print(f"[YOLOv8 Inference] Study {study_id}: 0 candidate boxes detected across entire image.")
+
+                base.update({
+                    "detection_status": "no_detection",
+                    "predicted_class": "Inconclusive",
+                    "confidence": None,
+                    "boxes": [],
+                    "quantitative_findings": {
+                        "lesion_area_px": None,
+                        "lesion_area": None,
+                        "aspect_ratio": None,
+                        "shape": "Not assessed",
+                        "margin": "Not assessed",
+                        "orientation": "Not assessed",
+                    }
+                })
+                return base
+
+            # Select the highest-confidence detected box for the summary
+            best = max(boxes_list, key=lambda item: item["confidence"])
+            print(f"[YOLOv8 Inference] Study {study_id}: {len(boxes_list)} detection(s) found. Top finding: '{best['class']}' with conf {best['confidence']:.4f}")
+
+            base.update({
+                "predicted_class": best["class"],
+                "confidence": best["confidence"],
+                "detection_status": "detected",
+                "boxes": boxes_list,
+                "quantitative_findings": {
+                    "lesion_area_px": best["area_px"],
+                    "lesion_area": best["area_px"],
+                    "aspect_ratio": best["aspect_ratio"],
+                    "shape": "Not assessed from bounding box",
+                    "margin": "Not assessed from bounding box",
+                    "orientation": "Not assessed from bounding box",
+                },
+            })
+            return base
+
+        except Exception as exc:
+            cv2.imwrite(str(annotated_path), original_bgr)
+            print(f"[YOLOv8 ERROR] Inference exception on study {study_id}: {exc}")
+            raise RuntimeError(f"Ultrasound YOLO inference failed: {exc}") from exc

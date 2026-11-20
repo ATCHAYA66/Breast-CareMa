@@ -6,6 +6,7 @@ import {
   History, 
   FileText, 
   BarChart3, 
+  FlaskConical,
   Info, 
   Settings,
   Heart

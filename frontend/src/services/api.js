@@ -49,4 +49,18 @@ export const reportsApi = {
   getPdfUrl: (studyId) => `/api/reports/${studyId}/pdf`,
 };
 
+export const researchApi = {
+  getStatus: () => api.get('/research/busi/status'),
+  analyze: (file, studyId = null) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (studyId) {
+      formData.append('study_id', studyId);
+    }
+    return api.post('/research/busi/analyze', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+};
+
 export default api;

@@ -1,0 +1,122 @@
+{
+  "timestamp": "2026-11-19T12:35:41Z",
+  "base_url": "http://127.0.0.1:8001",
+  "tests": {
+    "status_endpoint": {
+      "http_code": 200,
+      "body": {
+        "status": "ready",
+        "models": {
+          "classifier": {
+            "name": "BUSI EfficientNet-B0 (3-Class)",
+            "loaded": true,
+            "weights_exists": true,
+            "classes": [
+              "Benign",
+              "Malignant",
+              "Normal"
+            ],
+            "device": "cuda",
+            "error": null
+          },
+          "segmenter": {
+            "name": "BUSI Compact U-Net (Binary)",
+            "loaded": true,
+            "weights_exists": true,
+            "threshold": 0.5,
+            "device": "cuda",
+            "error": null
+          }
+        },
+        "purpose": "Academic research and comparative model evaluation only."
+      }
+    },
+    "sample_benign": {
+      "http_code": 200,
+      "predicted_class": "Benign",
+      "confidence": 0.9967,
+      "mask_detected": true,
+      "lesion_area_pct": 1.53,
+      "overlay_url": "/outputs/live_test_benign_busi_research_overlay.jpg"
+    },
+    "sample_malignant": {
+      "http_code": 200,
+      "predicted_class": "Malignant",
+      "confidence": 0.9902,
+      "mask_detected": true,
+      "lesion_area_pct": 7.28
+    },
+    "sample_normal": {
+      "http_code": 200,
+      "predicted_class": "Normal",
+      "confidence": 0.9949,
+      "mask_detected": false,
+      "lesion_area_pct": 0.0
+    },
+    "empty_mask_safety": {
+      "http_code": 200,
+      "classifier_class": "Malignant",
+      "mask_detected": false,
+      "overrides_classifier": false
+    },
+    "overlay_image_access": {
+      "http_code": 200,
+      "content_type": "image/jpeg",
+      "bytes": 82637,
+      "valid_jpeg": true
+    },
+    "robustness": {
+      "pdf_rejected": true,
+      "exe_rejected": true,
+      "empty_rejected": true,
+      "corrupt_rejected": true
+    },
+    "path_traversal_prevention": [
+      {
+        "input": "../../traversal_attack",
+        "sanitized": "traversal_attack",
+        "safe": true
+      },
+      {
+        "input": "..\\..\\win_traversal",
+        "sanitized": "win_traversal",
+        "safe": true
+      },
+      {
+        "input": "/etc/passwd",
+        "sanitized": "passwd",
+        "safe": true
+      },
+      {
+        "input": "C:\\Windows\\System32",
+        "sanitized": "System32",
+        "safe": true
+      }
+    ],
+    "latency_singleton": [
+      0.12463712692260742,
+      0.12276315689086914,
+      0.12391471862792969
+    ],
+    "production_yolo_pipeline": {
+      "status": "completed",
+      "prediction": "Inconclusive",
+      "confidence": null,
+      "results_count": 1
+    },
+    "database_isolation": {
+      "initial_counts": {
+        "diagnosis": 23,
+        "images": 20,
+        "results": 22
+      },
+      "final_counts": {
+        "diagnosis": 24,
+        "images": 21,
+        "results": 23
+      },
+      "research_mutations": 0,
+      "isolation_verified": true
+    }
+  }
+}

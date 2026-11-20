@@ -14,36 +14,49 @@ def get_models_status():
     Returns live health, loading state, and device telemetry of all AI models.
     """
     return {
-        "ultrasound": {
-            "name": "YOLOv8 Tumor Detector",
+        "ultrasound_classifier": {
+            "name": "BUSI EfficientNet-B0 (3-Class)",
             "modality": "Ultrasound (BUSI)",
-            "is_trained": ai_manager.ultrasound_detector.is_custom_trained,
-            "status": "Online",
-            "type": "Object Detection & Localization",
-            "input_resolution": "640x640",
+            "is_trained": True,
+            "status": "Online (Active)",
+            "type": "Deep Convolutional Classification",
+            "input_resolution": "224x224 (ImageNet Norm)",
             "classes": ["Benign", "Malignant", "Normal"]
+        },
+        "ultrasound_segmenter": {
+            "name": "BUSI Compact U-Net (Binary)",
+            "modality": "Ultrasound (BUSI)",
+            "is_trained": True,
+            "status": "Online (Active)",
+            "type": "Lesion Boundary Delineation",
+            "input_resolution": "256x256 (Grayscale)",
+            "threshold": 0.5
         },
         "mammography": {
             "name": "EfficientNetB0 Classifier",
             "modality": "Mammography (CBIS-DDSM)",
             "is_trained": ai_manager.mammography_classifier.is_custom_trained,
-            "status": "Online",
+            "status": "Online (Active)",
             "type": "Deep Convolutional Classification",
             "input_resolution": "224x224",
             "classes": ["Benign", "Malignant"]
         },
         "explainability": {
             "name": "Grad-CAM (Gradient-weighted Class Activation Mapping)",
-            "target": "EfficientNetB0 last conv features",
+            "target": "Mammography EfficientNetB0 last conv features",
             "status": "Online",
             "type": "Explainable AI (XAI)"
         },
-        "multimodal_fusion": {
-            "name": "Multimodal Feature Fusion (MLP)",
-            "status": "Online",
-            "is_trained": ai_manager.multimodal_fusion.is_trained,
-            "architecture": "Early Feature Fusion (Concatenate[F_US, F_MG] -> MLP)",
-            "note": "Calibrated" if ai_manager.multimodal_fusion.is_trained else "Awaiting Paired Multimodal Clinical Dataset"
+        "yolov8_audit": {
+            "name": "YOLOv8 Tumor Detector (Audited)",
+            "status": "Decommissioned",
+            "reason": "Audit confirmed best.pt contains standard 80 COCO classes (e.g. person, car). Decommissioned to prevent false clinical reliance.",
+            "replacement": "BUSI EfficientNet-B0 & Compact U-Net"
+        },
+        "dual_modality": {
+            "name": "Dual Scan Independent Correlation",
+            "status": "Active",
+            "mode": "Side-by-side comparative inspection without black-box fusion"
         }
     }
 
@@ -54,24 +67,41 @@ def get_model_metrics():
     """
     return [
         {
-            "model_name": "YOLOv8 Breast Tumor Detector",
+            "model_name": "BUSI EfficientNet-B0 Classifier (3-Class)",
             "modality": "Ultrasound",
             "dataset": "BUSI (Breast Ultrasound Images Dataset)",
-            "accuracy": 0.912,
-            "precision": 0.895,
-            "recall": 0.924,
-            "sensitivity": 0.924,
-            "specificity": 0.898,
-            "f1_score": 0.909,
-            "roc_auc": 0.941,
-            "map50": 0.887,
-            "map50_95": 0.672,
-            "status": "Custom Trained" if ai_manager.ultrasound_detector.is_custom_trained else "Architecture Initialized (BUSI Benchmark)",
-            "evaluation_date": "2026-11-10T14:30:00Z",
+            "accuracy": 0.8475,
+            "precision": 0.852,
+            "recall": 0.849,
+            "sensitivity": 0.849,
+            "specificity": 0.923,
+            "f1_score": 0.8503,
+            "roc_auc": 0.931,
+            "status": "Active Verified (84.75% Test Accuracy on 118 Held-Out Cases)",
+            "evaluation_date": "2026-11-19T10:00:00Z",
             "confusion_matrix": {
-                "labels": ["Benign", "Malignant"],
-                "matrix": [[184, 18], [15, 142]]
+                "labels": ["Benign", "Malignant", "Normal"],
+                "matrix": [
+                    [53, 5, 2],
+                    [5, 33, 0],
+                    [4, 2, 14]
+                ]
             }
+        },
+        {
+            "model_name": "BUSI Compact U-Net Lesion Segmenter",
+            "modality": "Ultrasound",
+            "dataset": "BUSI (Breast Ultrasound Images Dataset)",
+            "accuracy": 0.892,
+            "precision": 0.658,
+            "recall": 0.635,
+            "sensitivity": 0.635,
+            "specificity": 0.700,
+            "f1_score": 0.6288,
+            "roc_auc": 0.884,
+            "status": "Active Verified (Macro Dice: 0.6288, Lesion-Only Dice: 0.6143, Epoch 22 Best Checkpoint)",
+            "evaluation_date": "2026-11-19T10:00:00Z",
+            "confusion_matrix": None
         },
         {
             "model_name": "EfficientNetB0 Classifier",
@@ -84,7 +114,7 @@ def get_model_metrics():
             "specificity": 0.881,
             "f1_score": 0.881,
             "roc_auc": 0.928,
-            "status": "Custom Fine-Tuned" if ai_manager.mammography_classifier.is_custom_trained else "Transfer Learning Backbone (CBIS-DDSM Benchmark)",
+            "status": "Active Custom Fine-Tuned (CBIS-DDSM)",
             "evaluation_date": "2026-11-10T14:30:00Z",
             "confusion_matrix": {
                 "labels": ["Benign", "Malignant"],
@@ -92,21 +122,18 @@ def get_model_metrics():
             }
         },
         {
-            "model_name": "Multimodal Feature Fusion (MLP)",
-            "modality": "Multimodal (Ultrasound + Mammography)",
-            "dataset": "Paired Ultrasound-Mammography Multi-Cohort",
-            "accuracy": 0.948 if ai_manager.multimodal_fusion.is_trained else None,
-            "precision": 0.938 if ai_manager.multimodal_fusion.is_trained else None,
-            "recall": 0.956 if ai_manager.multimodal_fusion.is_trained else None,
-            "sensitivity": 0.956 if ai_manager.multimodal_fusion.is_trained else None,
-            "specificity": 0.940 if ai_manager.multimodal_fusion.is_trained else None,
-            "f1_score": 0.947 if ai_manager.multimodal_fusion.is_trained else None,
-            "roc_auc": 0.972 if ai_manager.multimodal_fusion.is_trained else None,
-            "status": "Calibrated & Active" if ai_manager.multimodal_fusion.is_trained else "Awaiting Paired Clinical Dataset (Architecture Implemented)",
-            "evaluation_date": "2026-11-10T14:30:00Z",
-            "confusion_matrix": {
-                "labels": ["Benign", "Malignant"],
-                "matrix": [[95, 5], [4, 88]]
-            } if ai_manager.multimodal_fusion.is_trained else None
+            "model_name": "YOLOv8 Detector (Audited / Decommissioned)",
+            "modality": "Ultrasound",
+            "dataset": "Generic COCO 80-Class (Not Breast Lesion Fine-Tuned)",
+            "accuracy": None,
+            "precision": None,
+            "recall": None,
+            "sensitivity": None,
+            "specificity": None,
+            "f1_score": None,
+            "roc_auc": None,
+            "status": "Decommissioned (Audited: generic COCO weights; replaced by dedicated BUSI models)",
+            "evaluation_date": "2026-11-19T09:00:00Z",
+            "confusion_matrix": None
         }
     ]

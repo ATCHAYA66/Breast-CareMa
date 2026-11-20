@@ -26,3 +26,5 @@ MAX_FILE_SIZE_BYTES = 30 * 1024 * 1024
 YOLO_WEIGHTS_PATH = WEIGHTS_DIR / "best.pt"
 EFFICIENTNET_WEIGHTS_PATH = WEIGHTS_DIR / "efficientnet_b0_mammography.pth"
 FUSION_WEIGHTS_PATH = WEIGHTS_DIR / "multimodal_fusion.pth"
+BUSI_CLASSIFIER_WEIGHTS_PATH = WEIGHTS_DIR / "research_busi_classifier_best.pth"
+BUSI_UNET_WEIGHTS_PATH = WEIGHTS_DIR / "research_busi_unet_best.pth"

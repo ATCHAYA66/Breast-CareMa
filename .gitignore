@@ -44,3 +44,25 @@ backend/reports/*
 Thumbs.db
 .ultralytics/
 backend/.ultralytics/
+
+# Model weights (large binary files — do not push to GitHub)
+backend/weights/*.pth
+backend/weights/*.pt
+# Keep metrics JSON files (small, human-readable)
+!backend/weights/*.json
+
+# CBIS-DDSM DICOM images (163+ GB — never push)
+datasets/cbis_ddsm/images/
+datasets/cbis_ddsm/images_overflow/
+
+# BUSI dataset images (do not push raw dataset)
+datasets/BUSI/
+
+# Training artifacts and overlays
+training/audit_overlays/
+training/inspection_overlays/
+training/__pycache__/
+
+# Keep gitignore placeholder files
+!datasets/.gitkeep
+!datasets/cbis_ddsm/.gitkeep

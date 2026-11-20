@@ -1,0 +1,6 @@
+{
+  "architecture": "compact_unet",
+  "test_dice": 0.6291471658815542,
+  "best_val_dice": 0.6186469910129652,
+  "checkpoint": "backend\\weights\\research_busi_unet_best.pth"
+}

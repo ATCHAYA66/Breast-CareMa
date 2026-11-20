@@ -27,12 +27,12 @@ export default function ProcessingPage() {
   const [studyData, setStudyData] = useState(null);
 
   const stages = [
-    { title: '1. Image Preprocessing', desc: 'Applying CLAHE contrast enhancement and ImageNet tensor normalization.', icon: Layers },
+    { title: '1. Image Preprocessing', desc: 'Applying modality-specific tensor normalization (RGB ImageNet for classifier, Grayscale for segmenter).', icon: Layers },
     { title: '2. Feature Extraction', desc: 'Extracting deep spatial and convolutional representations.', icon: Cpu },
-    { title: '3. Ultrasound Model Inference', desc: 'Executing YOLOv8 neural network for tumor localization & bounding-boxes.', icon: Activity },
+    { title: '3. Ultrasound BUSI Inference', desc: 'Executing BUSI EfficientNet-B0 (3-Class) & Compact U-Net lesion segmentation.', icon: Activity },
     { title: '4. Mammography Inference & Grad-CAM', desc: 'Computing EfficientNetB0 class probabilities & gradient activation heatmaps.', icon: FileText },
-    { title: '5. Multimodal Feature Fusion', desc: 'Concatenating acoustic & radiographic embeddings through multimodal MLP.', icon: Sparkles },
-    { title: '6. Generating Diagnostic Findings', desc: 'Compiling quantitative morphological metrics, BI-RADS criteria & PDF report.', icon: FileCheck2 },
+    { title: '5. Modality Correlation', desc: 'Correlating independent findings side-by-side without black-box fusion.', icon: Sparkles },
+    { title: '6. Generating Diagnostic Findings', desc: 'Compiling verified quantitative metrics & PDF report.', icon: FileCheck2 },
   ];
 
   useEffect(() => {

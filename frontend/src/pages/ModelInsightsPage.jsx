@@ -127,9 +127,17 @@ export default function ModelInsightsPage() {
                 )}
               </div>
             ) : (
-              <div className="p-6 rounded-2xl bg-purple-50/80 border border-purple-200 text-xs text-purple-950 leading-relaxed">
-                <strong className="block font-bold text-sm mb-1 text-[#6825A8]">Academic Integrity Disclosure:</strong>
-                Multimodal feature fusion MLP architecture (512-dim + 1280-dim feature concatenation) is implemented and ready. Quantitative metrics will be populated when trained on an empirical paired ultrasound-mammography cohort, strictly adhering to the prompt rule against fabricating benchmark metrics.
+              <div className="p-6 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 leading-relaxed">
+                <strong className="block font-bold text-sm mb-1 text-amber-900">Architecture & Audit Disclosure:</strong>
+                {model.model_name?.includes('YOLO') ? (
+                  <p>
+                    Audit confirmed that the original weights file (<code>best.pt</code>) contained 80 standard COCO detection classes (person, car, etc.) and was never trained on breast lesions. In strict accordance with medical AI safety protocols, YOLOv8 was decommissioned from the clinical pipeline and replaced by the validated BUSI EfficientNet-B0 classifier and Compact U-Net segmenter.
+                  </p>
+                ) : (
+                  <p>
+                    Independent dual-modality correlation architecture is active. Ultrasound and mammography models operate independently without fabricating unvalidated black-box fusion scores.
+                  </p>
+                )}
               </div>
             )}
 

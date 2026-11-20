@@ -1,0 +1,209 @@
+{
+  "spa_html": {
+    "status": "passed",
+    "code": 200
+  },
+  "bundle_content": {
+    "status": "passed",
+    "file": "index-BfB5eU_j.js"
+  },
+  "spa_routing": {
+    "status": "passed"
+  },
+  "model_status": {
+    "status": "passed",
+    "body": {
+      "status": "ready",
+      "models": {
+        "classifier": {
+          "name": "BUSI EfficientNet-B0 (3-Class)",
+          "loaded": true,
+          "weights_exists": true,
+          "classes": [
+            "Benign",
+            "Malignant",
+            "Normal"
+          ],
+          "device": "cuda",
+          "error": null
+        },
+        "segmenter": {
+          "name": "BUSI Compact U-Net (Binary)",
+          "loaded": true,
+          "weights_exists": true,
+          "threshold": 0.5,
+          "device": "cuda",
+          "error": null
+        }
+      },
+      "purpose": "Academic research and comparative model evaluation only."
+    }
+  },
+  "sample_benign": {
+    "status": "success",
+    "study_id": "FE_TEST_BENIGN",
+    "filename": "FE_TEST_BENIGN_3d17d4.png",
+    "image_dimensions": {
+      "width": 563,
+      "height": 464,
+      "channels": 3
+    },
+    "classifier": {
+      "status": "success",
+      "predicted_class": "Benign",
+      "confidence": 0.9967,
+      "class_probabilities": {
+        "Benign": 0.9967,
+        "Malignant": 0.0033,
+        "Normal": 0.0001
+      },
+      "confidence_type": "uncalibrated_softmax",
+      "error": null
+    },
+    "segmentation": {
+      "status": "success",
+      "mask_detected": true,
+      "lesion_area_percentage": 1.53,
+      "threshold": 0.5,
+      "mask_overlay_url": "/outputs/FE_TEST_BENIGN_busi_research_overlay.jpg",
+      "interpretation": "Lesion contour delineated by U-Net covering 1.53% of image area. Represents anatomical boundary localization only; does not provide a histological diagnosis.",
+      "error": null
+    },
+    "safety_guardrails": {
+      "segmentation_overrides_classifier": false,
+      "empty_mask_implies_normal": false,
+      "clinical_triage_authorized": false
+    },
+    "disclaimer": "ACADEMIC RESEARCH ONLY: Experimental research models (EfficientNet-B0 and compact U-Net trained on the BUSI dataset). Outputs are uncalibrated and NOT validated for diagnostic decisions, patient triage, or malignancy exclusion. Clinical diagnosis must be made by a qualified radiologist."
+  },
+  "sample_malignant": {
+    "status": "success",
+    "study_id": "FE_TEST_MALIGNANT",
+    "filename": "FE_TEST_MALIGNANT_bb64c4.png",
+    "image_dimensions": {
+      "width": 775,
+      "height": 591,
+      "channels": 3
+    },
+    "classifier": {
+      "status": "success",
+      "predicted_class": "Malignant",
+      "confidence": 0.9902,
+      "class_probabilities": {
+        "Benign": 0.0087,
+        "Malignant": 0.9902,
+        "Normal": 0.0011
+      },
+      "confidence_type": "uncalibrated_softmax",
+      "error": null
+    },
+    "segmentation": {
+      "status": "success",
+      "mask_detected": true,
+      "lesion_area_percentage": 7.28,
+      "threshold": 0.5,
+      "mask_overlay_url": "/outputs/FE_TEST_MALIGNANT_busi_research_overlay.jpg",
+      "interpretation": "Lesion contour delineated by U-Net covering 7.28% of image area. Represents anatomical boundary localization only; does not provide a histological diagnosis.",
+      "error": null
+    },
+    "safety_guardrails": {
+      "segmentation_overrides_classifier": false,
+      "empty_mask_implies_normal": false,
+      "clinical_triage_authorized": false
+    },
+    "disclaimer": "ACADEMIC RESEARCH ONLY: Experimental research models (EfficientNet-B0 and compact U-Net trained on the BUSI dataset). Outputs are uncalibrated and NOT validated for diagnostic decisions, patient triage, or malignancy exclusion. Clinical diagnosis must be made by a qualified radiologist."
+  },
+  "sample_normal": {
+    "status": "success",
+    "study_id": "FE_TEST_NORMAL",
+    "filename": "FE_TEST_NORMAL_89214a.png",
+    "image_dimensions": {
+      "width": 557,
+      "height": 475,
+      "channels": 3
+    },
+    "classifier": {
+      "status": "success",
+      "predicted_class": "Normal",
+      "confidence": 0.9949,
+      "class_probabilities": {
+        "Benign": 0.0044,
+        "Malignant": 0.0006,
+        "Normal": 0.9949
+      },
+      "confidence_type": "uncalibrated_softmax",
+      "error": null
+    },
+    "segmentation": {
+      "status": "success",
+      "mask_detected": false,
+      "lesion_area_percentage": 0.0,
+      "threshold": 0.5,
+      "mask_overlay_url": "/outputs/FE_TEST_NORMAL_busi_research_overlay.jpg",
+      "interpretation": "No focal lesion contour delineated at the 0.50 probability threshold. IMPORTANT SAFETY NOTICE: An empty segmentation mask does NOT imply a normal scan or absence of pathology.",
+      "error": null
+    },
+    "safety_guardrails": {
+      "segmentation_overrides_classifier": false,
+      "empty_mask_implies_normal": false,
+      "clinical_triage_authorized": false
+    },
+    "disclaimer": "ACADEMIC RESEARCH ONLY: Experimental research models (EfficientNet-B0 and compact U-Net trained on the BUSI dataset). Outputs are uncalibrated and NOT validated for diagnostic decisions, patient triage, or malignancy exclusion. Clinical diagnosis must be made by a qualified radiologist."
+  },
+  "empty_mask_malignant": {
+    "status": "success",
+    "study_id": "FE_TEST_EMPTY_MASK",
+    "filename": "FE_TEST_EMPTY_MASK_fe4dfb.png",
+    "image_dimensions": {
+      "width": 471,
+      "height": 393,
+      "channels": 3
+    },
+    "classifier": {
+      "status": "success",
+      "predicted_class": "Malignant",
+      "confidence": 0.5112,
+      "class_probabilities": {
+        "Benign": 0.2326,
+        "Malignant": 0.5112,
+        "Normal": 0.2562
+      },
+      "confidence_type": "uncalibrated_softmax",
+      "error": null
+    },
+    "segmentation": {
+      "status": "success",
+      "mask_detected": false,
+      "lesion_area_percentage": 0.0,
+      "threshold": 0.5,
+      "mask_overlay_url": "/outputs/FE_TEST_EMPTY_MASK_busi_research_overlay.jpg",
+      "interpretation": "No focal lesion contour delineated at the 0.50 probability threshold. IMPORTANT SAFETY NOTICE: An empty segmentation mask does NOT imply a normal scan or absence of pathology.",
+      "error": null
+    },
+    "safety_guardrails": {
+      "segmentation_overrides_classifier": false,
+      "empty_mask_implies_normal": false,
+      "clinical_triage_authorized": false
+    },
+    "disclaimer": "ACADEMIC RESEARCH ONLY: Experimental research models (EfficientNet-B0 and compact U-Net trained on the BUSI dataset). Outputs are uncalibrated and NOT validated for diagnostic decisions, patient triage, or malignancy exclusion. Clinical diagnosis must be made by a qualified radiologist."
+  },
+  "overlay_retrieval": {
+    "status": "passed",
+    "bytes": 82637
+  },
+  "negative_inputs": {
+    "status": "passed"
+  },
+  "production_yolo": {
+    "status": "passed",
+    "prediction": "Inconclusive"
+  },
+  "db_isolation": {
+    "status": "passed",
+    "delta": {
+      "diagnosis": 1,
+      "images": 1,
+      "results": 1
+    }
+  }
+}

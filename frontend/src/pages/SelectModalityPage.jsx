@@ -14,9 +14,9 @@ export default function SelectModalityPage() {
     {
       id: 'ultrasound',
       title: 'Single Scan – Ultrasound',
-      subtitle: 'Acoustic Tumor Detection',
-      description: 'Analyze breast ultrasound images using the trained YOLOv8 model for lesion localization, bounding-box identification, and morphological metrics.',
-      model: 'YOLOv8 Tumor Detector (BUSI)',
+      subtitle: 'BUSI Dual-Model Analysis',
+      description: 'Analyze breast ultrasound images using BUSI EfficientNet-B0 (3-Class: Benign, Malignant, Normal) and Compact U-Net binary lesion segmentation with overlay visualization.',
+      model: 'BUSI EfficientNet-B0 + Compact U-Net',
       icon: Activity,
       color: '#6825A8',
       badge: 'Single Modality'
@@ -33,13 +33,13 @@ export default function SelectModalityPage() {
     },
     {
       id: 'dual',
-      title: 'Dual Scan – Multimodal',
-      subtitle: 'Multimodal Feature Fusion (Recommended)',
-      description: 'Analyze both ultrasound and mammography scans simultaneously using deep feature fusion, combining acoustic echogenicity and radiographic density.',
-      model: 'YOLOv8 + EfficientNetB0 + Feature Fusion MLP',
+      title: 'Dual Scan – Combined',
+      subtitle: 'Independent Comparative Evaluation',
+      description: 'Analyze both ultrasound and mammography scans side-by-side using independent dedicated pipelines. Ultrasound is evaluated by BUSI models and mammography by EfficientNetB0 without artificial black-box fusion.',
+      model: 'Independent Dual-Modality (BUSI + EfficientNet)',
       icon: Sparkles,
       color: '#351052',
-      badge: 'Highest Sensitivity'
+      badge: 'Comparative Dual'
     }
   ];
 

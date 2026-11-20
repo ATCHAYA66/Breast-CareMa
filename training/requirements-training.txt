@@ -1,0 +1,5 @@
+# Install PyTorch using the selector at https://pytorch.org/get-started/locally/ for your Windows/CUDA setup.
+torch
+torchvision
+numpy
+Pillow
